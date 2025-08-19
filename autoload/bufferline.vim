@@ -4,12 +4,22 @@ let s:updatetime = &updatetime
 " keep track of scrollinf window start
 let s:window_start = 0
 
+function! s:get_buffers_list()
+  if exists('g:bufferline_get_buffers_list')
+    let result = g:bufferline_get_buffers_list()
+    " echo result
+    return result
+  else
+    return range(1, bufnr('$'))
+  endif
+endfunction
+
 function! s:generate_names()
   let names = []
   let i = 1
   let last_buffer = bufnr('$')
   let current_buffer = bufnr('%')
-  while i <= last_buffer
+  for i in s:get_buffers_list()
     if bufexists(i) && buflisted(i)
       let modified = ' '
       if getbufvar(i, '&mod')
@@ -46,8 +56,7 @@ function! s:generate_names()
         call add(names, [i, name])
       endif
     endif
-    let i += 1
-  endwhile
+  endfor
 
   if len(names) > 1
     if g:bufferline_rotate == 1
